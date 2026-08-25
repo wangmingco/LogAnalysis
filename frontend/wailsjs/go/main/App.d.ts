@@ -20,10 +20,14 @@ export function Greet(arg1:string):Promise<string>;
 
 export function ListLogFiles(arg1:string,arg2:boolean):Promise<Array<main.FileInfo>>;
 
+export function LoadConfig():Promise<main.Config>;
+
 export function LoadFiles(arg1:Array<string>,arg2:number,arg3:string):Promise<Array<main.FileInfo>>;
 
 export function PickDirectory():Promise<string>;
 
 export function PickFile():Promise<string>;
+
+export function SaveConfig(arg1:main.Config):Promise<void>;
 
 export function UnloadAll():Promise<void>;

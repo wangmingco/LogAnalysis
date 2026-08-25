@@ -1,5 +1,21 @@
 export namespace main {
 	
+	export class Config {
+	    year: number;
+	    logFormat: string;
+	    workingDir: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Config(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.year = source["year"];
+	        this.logFormat = source["logFormat"];
+	        this.workingDir = source["workingDir"];
+	    }
+	}
 	export class FileInfo {
 	    name: string;
 	    path: string;

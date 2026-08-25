@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -92,6 +93,45 @@ func (a *App) PickFile() string {
 // GetDefaultYear returns a suggested year for parsing MM-DD timestamps.
 func (a *App) GetDefaultYear() int {
 	return time.Now().Year()
+}
+
+// ---- config persistence ----
+
+// Config describes the persisted UI settings (filter + format). It is stored in
+// the OS temp dir so the app can restore the last session on the next launch.
+type Config struct {
+	Year       int    `json:"year"`
+	LogFormat  string `json:"logFormat"`
+	WorkingDir string `json:"workingDir"`
+}
+
+// configPath returns the config file location in the OS temp directory.
+// os.TempDir() honours the platform convention: Windows %TEMP%, and the
+// TMPDIR/TEMP/TMP env vars on Linux/macOS (usually /tmp).
+func configPath() string {
+	return filepath.Join(os.TempDir(), "loganalysis-config.json")
+}
+
+// LoadConfig reads the persisted config from the OS temp dir. It returns a
+// zero-valued Config when the file is missing or unreadable, so callers can
+// fall back to defaults.
+func (a *App) LoadConfig() Config {
+	var cfg Config
+	data, err := os.ReadFile(configPath())
+	if err != nil {
+		return cfg
+	}
+	_ = json.Unmarshal(data, &cfg)
+	return cfg
+}
+
+// SaveConfig writes the given config to the OS temp dir.
+func (a *App) SaveConfig(cfg Config) {
+	data, err := json.MarshalIndent(cfg, "", "  ")
+	if err != nil {
+		return
+	}
+	_ = os.WriteFile(configPath(), data, 0o600)
 }
 
 // GetWorkingDir returns the app's current working directory (where it was launched).

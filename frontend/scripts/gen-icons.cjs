@@ -1,14 +1,10 @@
-import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import sharp from 'sharp';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname, '..');
+const { mkdirSync, writeFileSync, readFileSync } = require('node:fs');
+const { dirname, join } = require('node:path');
+const sharp = require('sharp');
 
 // ---- 输出位置（相对 frontend/）----
-const publicDir = join(root, 'public');
-const buildDir = join(root, '..', 'build');
+const publicDir = join(__dirname, '..', 'public');
+const buildDir = join(__dirname, '..', '..', 'build');
 
 const svgPath = join(publicDir, 'favicon.svg');
 const svg = readFileSync(svgPath);
@@ -24,12 +20,6 @@ function render(size, to) {
 // ---- PNG 直出 ----
 mkdirSync(publicDir, { recursive: true });
 mkdirSync(buildDir, { recursive: true });
-
-for (const size of PNG_SIZES) {
-  await render(size, join(publicDir, `favicon-${size}.png`));
-}
-await render(APPLE_TOUCH, join(publicDir, 'apple-touch-icon.png'));
-await render(512, join(buildDir, 'appicon.png'));
 
 // ---- PNG 压缩 ICO 打包（手写二进制，Vista+ 格式）----
 async function buildIco(sizes, target) {
@@ -61,13 +51,26 @@ async function buildIco(sizes, target) {
   writeFileSync(target, ico);
 }
 
-await buildIco(ICO_SIZES, join(buildDir, 'windows', 'icon.ico'));
-await buildIco([48, 32, 16], join(publicDir, 'favicon.ico'));
+async function main() {
+  for (const size of PNG_SIZES) {
+    await render(size, join(publicDir, `favicon-${size}.png`));
+  }
+  await render(APPLE_TOUCH, join(publicDir, 'apple-touch-icon.png'));
+  await render(512, join(buildDir, 'appicon.png'));
 
-console.log('icons generated:');
-console.log('  public/favicon.svg (design source)');
-for (const size of PNG_SIZES) console.log(`  public/favicon-${size}.png`);
-console.log(`  public/apple-touch-icon.png (${APPLE_TOUCH})`);
-console.log('  public/favicon.ico (48/32/16)');
-console.log('  ../build/appicon.png (512)');
-console.log('  ../build/windows/icon.ico (256/128/64/48/32/24/16)');
+  await buildIco(ICO_SIZES, join(buildDir, 'windows', 'icon.ico'));
+  await buildIco([48, 32, 16], join(publicDir, 'favicon.ico'));
+
+  console.log('icons generated:');
+  console.log('  public/favicon.svg (design source)');
+  for (const size of PNG_SIZES) console.log(`  public/favicon-${size}.png`);
+  console.log(`  public/apple-touch-icon.png (${APPLE_TOUCH})`);
+  console.log('  public/favicon.ico (48/32/16)');
+  console.log('  ../build/appicon.png (512)');
+  console.log('  ../build/windows/icon.ico (256/128/64/48/32/24/16)');
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

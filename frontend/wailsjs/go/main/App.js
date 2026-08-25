@@ -38,6 +38,10 @@ export function ListLogFiles(arg1, arg2) {
   return window['go']['main']['App']['ListLogFiles'](arg1, arg2);
 }
 
+export function LoadConfig() {
+  return window['go']['main']['App']['LoadConfig']();
+}
+
 export function LoadFiles(arg1, arg2, arg3) {
   return window['go']['main']['App']['LoadFiles'](arg1, arg2, arg3);
 }
@@ -48,6 +52,10 @@ export function PickDirectory() {
 
 export function PickFile() {
   return window['go']['main']['App']['PickFile']();
+}
+
+export function SaveConfig(arg1) {
+  return window['go']['main']['App']['SaveConfig'](arg1);
 }
 
 export function UnloadAll() {

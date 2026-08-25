@@ -6,7 +6,7 @@ import ResultList from './components/ResultList';
 import DetailPane from './components/DetailPane';
 import CompareView from './components/CompareView';
 import StatusBar from './components/StatusBar';
-import {Filter, GetDefaultYear, GetDetectedFormats, GetLoadedFiles, GetPage, GetWorkingDir, ListLogFiles, LoadFiles, PickDirectory, PickFile, UnloadAll} from '../wailsjs/go/main/App';
+import {Filter, GetDefaultYear, GetDetectedFormats, GetLoadedFiles, GetPage, GetWorkingDir, ListLogFiles, LoadConfig, LoadFiles, PickDirectory, PickFile, SaveConfig, UnloadAll} from '../wailsjs/go/main/App';
 
 function App() {
     const [year, setYear] = useState(2026);
@@ -18,6 +18,7 @@ function App() {
     const [statusMsg, setStatusMsg] = useState('就绪');
     const [logFormat, setLogFormat] = useState('');
     const [detectedFormats, setDetectedFormats] = useState([]);
+    const [configReady, setConfigReady] = useState(false); // true once saved config is applied
 
     // filter + result state
     const [filter, setFilter] = useState({
@@ -121,14 +122,37 @@ function App() {
     }, []);
 
     useEffect(() => {
-        GetDefaultYear().then(y => {
-            setYear(y);
-            setFilter(f => ({...f, year: y}));
-        });
-        GetWorkingDir().then(dir => {
-            if (dir) refreshDir(dir, false);
-        });
+        let cancelled = false;
+        (async () => {
+            let cfg = null;
+            let defaultYear = 2026;
+            try { cfg = await LoadConfig(); } catch { cfg = null; }
+            try { defaultYear = await GetDefaultYear(); } catch { /* ignore */ }
+            if (cancelled) return;
+            const cfgYear = (cfg && cfg.year) ? cfg.year : defaultYear;
+            setYear(cfgYear);
+            setLogFormat((cfg && cfg.logFormat) || '');
+            const savedDir = (cfg && cfg.workingDir) || '';
+            if (savedDir) {
+                refreshDir(savedDir, false);
+            } else {
+                GetWorkingDir().then(dir => { if (dir) refreshDir(dir, false); });
+            }
+            setConfigReady(true);
+        })();
+        return () => { cancelled = true; };
     }, [refreshDir]);
+
+    // Persist the UI configuration to the OS temp dir whenever it changes, but
+    // only after the saved config has been applied on startup.
+    useEffect(() => {
+        if (!configReady) return;
+        SaveConfig({
+            year,
+            logFormat,
+            workingDir,
+        });
+    }, [configReady, year, logFormat, workingDir]);
 
     const handlePickDir = async () => {
         const dir = await PickDirectory();

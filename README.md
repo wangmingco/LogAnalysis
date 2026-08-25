@@ -9,7 +9,8 @@
 - **格式自动识别**：不设置格式时，自动从多个文件窗口采样、对 log4j/logback 常用 pattern 打分识别，支持混合格式文件（主格式 + 备用格式）；也支持手动输入 logback 风格格式。
 - **逻辑记录折叠**：多行堆栈/续行合并为一条逻辑记录，并统计物理行/折叠行，便于理解"记录数 ≠ 行数"。
 - **结果列表**：虚拟滚动、行级关键字高亮、右键范围高亮（前/后 N 行、前/后 N 秒）、列隐藏/显示、双击单元格快捷添加关键字过滤（超过 20 字符不添加）。
-- **日志对比**：日志行右键「加入对比」→ 点击「对比」打开全屏对比工作区（顶部对比队列 + 左右文本对比），支持编辑、JSON/SQL 格式化、正则替换、复制/还原、字符级差异高亮、自动换行。
+- **日志对比**：日志行右键「加入对比」→ 点击「对比」打开全屏对比工作区（顶部对比队列 + 左右文本对比），支持编辑、JSON/SQL 格式化（可只格式化选中内容）、正则替换、复制/还原、字符级差异高亮、自动换行。
+- **配置持久化**：年份、日志格式、上次打开的工作目录在退出后自动保存到系统临时目录（Windows `%TEMP%`、Linux/macOS `/tmp` 等），下次启动自动恢复。
 
 ## 环境要求
 
@@ -69,4 +70,4 @@ cd backend && go test ./...
 
 - `backend/go.mod` 含一条机器相关的 `replace` 指令，指向本机 wails 本地目录（`C:\Users\wang\go\pkg\mod`），在其他机器上可能需要移除或调整。
 - 源文件与样例日志为 UTF-8 编码（含中文），Windows PowerShell 控制台可能乱码显示，不影响文件内容正确性。
-- `npm run icons`（`frontend/scripts/gen-icons.mjs`）从 `frontend/public/favicon.svg` 生成各尺寸图标（public 下的 favicon-*.png/ico 与 build 下的图标均为生成物）。
+- `npm run icons`（`frontend/scripts/gen-icons.cjs`）从 `frontend/public/favicon.svg` 生成各尺寸图标（public 下的 favicon-*.png/ico 与 build 下的图标均为生成物）。
