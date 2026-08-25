@@ -145,24 +145,38 @@ function CompareView({queue, leftKey, rightKey, entryKey, onClose, onRemove, onP
         msgTimer.current = setTimeout(() => setErr(''), 3000);
     };
 
-    const doJSON = (s) => {
+    // Run a formatter against the selected text of a pane when there is an
+    // active selection, otherwise against the whole content. The formatted
+    // result replaces only the selected range (the rest is left untouched) and
+    // the formatted selection is re-selected for review.
+    const doFormat = (s, fmt, okLabel, errMsg) => {
         setActive(s);
-        const res = formatJSON(freshText(s));
-        if (res === null) setError('不是有效的 JSON，无法格式化');
-        else {
+        const ref = s === 'A' ? aTextRef : bTextRef;
+        const el = ref.current;
+        if (!el) return;
+        const full = el.value;
+        const start = el.selectionStart;
+        const end = el.selectionEnd;
+        const hasSel = end > start;
+        const target = hasSel ? full.slice(start, end) : full;
+        const res = fmt(target);
+        if (res === null) {
+            setError(errMsg);
+            return;
+        }
+        if (hasSel) {
+            const next = full.slice(0, start) + res + full.slice(end);
+            setTextOf(s, next);
+            el.focus();
+            el.setSelectionRange(start, start + res.length);
+            flash(`${okLabel}（选中部分，${s} 侧）`);
+        } else {
             setTextOf(s, res);
-            flash(`已格式化 JSON（${s} 侧）`);
+            flash(`${okLabel}（${s} 侧）`);
         }
     };
-    const doSQL = (s) => {
-        setActive(s);
-        const res = formatSQL(freshText(s));
-        if (res === null) setError('未检测到可格式化的 SQL');
-        else {
-            setTextOf(s, res);
-            flash(`已格式化 SQL（${s} 侧）`);
-        }
-    };
+    const doJSON = (s) => doFormat(s, formatJSON, '已格式化 JSON', '不是有效的 JSON，无法格式化');
+    const doSQL = (s) => doFormat(s, formatSQL, '已格式化 SQL', '未检测到可格式化的 SQL');
     const doCopy = async (s) => {
         setActive(s);
         try {
@@ -373,7 +387,6 @@ function CompareView({queue, leftKey, rightKey, entryKey, onClose, onRemove, onP
                                 defaultValue={aText}
                                 onChange={e => setAText(e.target.value)}
                                 onFocus={() => setActive('A')}
-                                onMouseDown={e => e.stopPropagation()}
                                 spellCheck={false}
                                 autoCapitalize="off"
                                 autoCorrect="off"
@@ -400,7 +413,6 @@ function CompareView({queue, leftKey, rightKey, entryKey, onClose, onRemove, onP
                                 defaultValue={bText}
                                 onChange={e => setBText(e.target.value)}
                                 onFocus={() => setActive('B')}
-                                onMouseDown={e => e.stopPropagation()}
                                 spellCheck={false}
                                 autoCapitalize="off"
                                 autoCorrect="off"
@@ -439,15 +451,13 @@ function CompareView({queue, leftKey, rightKey, entryKey, onClose, onRemove, onP
                         ref={rePatRef}
                         className="cmp-re-in"
                         placeholder="正则表达式，如 \d{4}-\d{2}-\d{2}"
-                        onMouseDown={e => e.stopPropagation()}
-                        onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') applyRegex(); }}
+                        onKeyDown={e => { if (e.key === 'Enter') applyRegex(); }}
                     />
                     <input
                         ref={reRepRef}
                         className="cmp-re-in"
                         placeholder="替换为"
-                        onMouseDown={e => e.stopPropagation()}
-                        onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') applyRegex(); }}
+                        onKeyDown={e => { if (e.key === 'Enter') applyRegex(); }}
                     />
                     <label className="cmp-re-opt">
                         <input type="checkbox" checked={reBoth} onChange={e => setReBoth(e.target.checked)} /> 两侧

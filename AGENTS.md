@@ -8,7 +8,7 @@ Wails v2 desktop app (Windows). Go backend in `backend/` + React 19 (JSX, no Typ
   - `go build ./...`, `go test ./...`, `go vet ./...` must run in `backend/`.
   - Frontend npm commands (`npm install`, `npm run build`) must run in `frontend/`.
 - Scripts at repo root:
-  - `build.bat` = `npm install --prefix frontend` → `npm run icons` → `wails build` (in `backend/`) → `build/bin/loganalysiz.exe`. This is the normal release build.
+  - `build.bat` = `npm install --prefix frontend` → `npm run icons` → `wails build` (in `backend/`) → `build/bin/loganalysis.exe`. This is the normal release build.
   - `dev.bat` = `wails dev` in `backend/` (hot reload; Vite dev server on `127.0.0.1:5173`).
   - `run.bat` = launch the built exe.
 - Verification (no lint/typecheck exists): `go vet ./...` + `go test ./...` (in `backend/`), then `npm run build` (in `frontend/`).

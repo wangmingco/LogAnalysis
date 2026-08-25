@@ -136,12 +136,16 @@ function FilterBar({year, filter, onRun, busy, disabled, total, loadedCount, pan
         });
     }, [loadedCount]);
 
-    const addKeyword = () => {
+    const submitKeyword = () => {
         const kw = input.trim();
         if (kw && !keywords.includes(kw)) {
             setKeywords([...keywords, kw]);
             setInput('');
         }
+    };
+
+    const addKeyword = () => {
+        submitKeyword();
         inputRef.current?.focus();
     };
 
@@ -239,7 +243,7 @@ function FilterBar({year, filter, onRun, busy, disabled, total, loadedCount, pan
                         placeholder={keywords.length ? '输入后回车添加…' : '输入关键字回车添加（多个关键字需全部匹配）'}
                         onChange={e => setInput(e.target.value)}
                         onKeyDown={onKeyDown}
-                        onBlur={addKeyword}
+                        onBlur={submitKeyword}
                     />
                 </div>
 

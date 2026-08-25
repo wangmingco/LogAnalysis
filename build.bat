@@ -1,10 +1,10 @@
 @echo off
 setlocal
 chcp 65001 >nul
-title LogAlacrity Build
+title LogAnalysis Build
 
 rem ============================================================
-rem  LogAlacrity - one-click build script
+rem  LogAnalysis - one-click build script
 rem  Go backend lives in backend\ ; wails build must run there.
 rem  Encoding: UTF-8 (no BOM) + chcp 65001. Keep Chinese ONLY in
 rem  echo lines; 'rem' comments must stay ASCII to avoid cmd quirks.
@@ -17,7 +17,7 @@ rem ============================================================
 cd /d "%~dp0backend"
 
 echo.
-echo  [LogAlacrity] 开始构建 ...
+echo  [LogAnalysis] 开始构建 ...
 echo.
 
 echo  [1/3] 检查前端依赖 ...
@@ -41,7 +41,7 @@ if errorlevel 1 goto :fail
 
 echo.
 echo  ============================================================
-echo   构建成功：..\build\bin\loganalysiz.exe
+echo   构建成功：..\build\bin\loganalysis.exe
 echo  ============================================================
 echo.
 pause

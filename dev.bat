@@ -1,10 +1,10 @@
 @echo off
 setlocal
 chcp 65001 >nul
-title LogAlacrity Dev
+title LogAnalysis Dev
 
 rem ============================================================
-rem  LogAlacrity - dev mode (hot reload)
+rem  LogAnalysis - dev mode (hot reload)
 rem  Go backend lives in backend\ ; wails dev must run there.
 rem  Uncomment the two lines below to route downloads through a
 rem  local proxy (default port 7890) in offline environments:
@@ -15,6 +15,6 @@ rem ============================================================
 cd /d "%~dp0backend"
 
 echo.
-echo  [LogAlacrity] 进入开发模式（Ctrl+C 退出）...
+echo  [LogAnalysis] 进入开发模式（Ctrl+C 退出）...
 echo.
 call wails dev

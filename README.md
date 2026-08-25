@@ -1,4 +1,4 @@
-# LogAlacrity · 日志分析器
+# LogAnalysis · 日志分析器
 
 基于 [Wails v2](https://wails.io) 的 Windows 桌面日志分析工具：Go 后端 + React 19 前端，用于快速加载、过滤、定位和对比大型日志文件。
 
@@ -23,9 +23,9 @@
 仓库根目录提供一键脚本（在 `backend/` 下执行 `wails build`/`wails dev`，Go 模块位于 `backend/`）：
 
 ```bat
-build.bat   REM 安装前端依赖 → 生成图标 → wails build → build\bin\loganalysiz.exe
+build.bat   REM 安装前端依赖 → 生成图标 → wails build → build\bin\loganalysis.exe
 dev.bat     REM wails dev，前端热更新（Vite 开发服务器 http://127.0.0.1:5173）
-run.bat     REM 启动已编译的 loganalysiz.exe
+run.bat     REM 启动已编译的 loganalysis.exe
 ```
 
 手动等价命令：

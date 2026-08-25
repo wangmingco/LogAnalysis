@@ -17,7 +17,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:     "LogAlacrity · 日志分析器",
+		Title:     "LogAnalysis · 日志分析器",
 		Width:     1280,
 		Height:    800,
 		MinWidth:  1024,
