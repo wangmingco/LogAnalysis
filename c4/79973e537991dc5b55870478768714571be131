@@ -1,0 +1,40 @@
+frontend/wailsjs/go/models.ts
+  s_6ff59d3fcc77e4::t_3020de1bd4013c 3-18
+frontend/wailsjs/go/main/App.js
+  s_6ff59d3fcc77e4::t_3020de1bd4013c 41-44,57-58
+README.md
+  s_6ff59d3fcc77e4::t_ebe275f34e0906 12
+  s_6ff59d3fcc77e4::t_1de50a0b565189 73
+  s_6ff59d3fcc77e4::t_3c431c4206376a 13
+frontend/src/App.jsx
+  s_6ff59d3fcc77e4::t_f9b5694b9af648 135-140,153,155
+  s_6ff59d3fcc77e4::t_71fa9bf552b5c3 21
+  s_6ff59d3fcc77e4::t_f57d4962db459d 9
+  s_6ff59d3fcc77e4::t_4a3283f8a2fa41 125-134,141-143,146-152,154
+frontend/scripts/gen-icons.cjs
+  s_6ff59d3fcc77e4::t_86119408f5e509 1-76
+backend/app.go
+  s_6ff59d3fcc77e4::t_f742a933496abd 5
+  s_6ff59d3fcc77e4::t_0b23c81d6ae43d 103-105
+  s_6ff59d3fcc77e4::t_37d9abffb2e5fc 98-102,106-136
+frontend/package.json
+  s_6ff59d3fcc77e4::t_6d0e2ac2cd5f9d 10
+frontend/wailsjs/go/main/App.d.ts
+  s_6ff59d3fcc77e4::t_3020de1bd4013c 23-24,31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "development:1.5.3",
+  "base_commit_sha": "c479973e537991dc5b55870478768714571be131",
+  "prompts": {},
+  "sessions": {
+    "s_6ff59d3fcc77e4": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fc8cf7f58ffeiTaxNf20QrRDHU",
+        "model": "unknown"
+      },
+      "human_author": "wangming <wangming.co@hotmail.com>"
+    }
+  }
+}
