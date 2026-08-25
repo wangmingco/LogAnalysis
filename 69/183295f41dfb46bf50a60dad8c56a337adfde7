@@ -1,0 +1,23 @@
+frontend/src/components/CompareView.jsx
+  s_6ff59d3fcc77e4::t_1db3891239f609 112
+  s_6ff59d3fcc77e4::t_419341e7fb1e52 231
+  s_6ff59d3fcc77e4::t_7bd921c7031b37 390
+  s_6ff59d3fcc77e4::t_72993a3a0463c0 416
+  s_6ff59d3fcc77e4::t_057c5fe2fb1872 61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "development:1.5.3",
+  "base_commit_sha": "69183295f41dfb46bf50a60dad8c56a337adfde7",
+  "prompts": {},
+  "sessions": {
+    "s_6ff59d3fcc77e4": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fc8cf7f58ffeiTaxNf20QrRDHU",
+        "model": "unknown"
+      },
+      "human_author": "wangming <wangming.co@hotmail.com>"
+    }
+  }
+}
