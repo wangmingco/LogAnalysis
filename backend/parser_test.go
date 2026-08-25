@@ -7,7 +7,7 @@ import (
 )
 
 func TestParseSample(t *testing.T) {
-	pl, err := parseLogFile("../logs-from-pttlbdrc-report-finance-in-pttlbdrc-report-finance-56c7cdb8c8-fq8xz.log", 2026, nil)
+	pl, err := parseLogFile("../xxl.log", 2026, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,7 +27,7 @@ func TestParseSample(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
-	pl, err := parseLogFile("../logs-from-pttlbdrc-report-finance-in-pttlbdrc-report-finance-56c7cdb8c8-fq8xz.log", 2026, nil)
+	pl, err := parseLogFile("../xxl.log", 2026, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,13 +41,13 @@ func TestFilter(t *testing.T) {
 }
 
 func TestLogbackPattern(t *testing.T) {
-	// "2026-08-16 21:30:41,396 INFO  [main] com.pttl.X - hello world"
+	// "2026-08-16 21:30:41,396 INFO  [main] com.xxl.X - hello world"
 	dir := t.TempDir()
 	path := dir + "\\pat.log"
-	content := "2026-08-16 21:30:41,396 INFO  [main] com.pttl.X - hello world\n" +
-		"2026-08-16 21:30:42,100 ERROR [http-1] com.pttl.Y - boom failed\n" +
-		"   at com.pttl.Y.doSomething(X.java:10)\n" +
-		"2026-08-16 21:30:43,000 WARN  [main] com.pttl.Z - note thing\n"
+	content := "2026-08-16 21:30:41,396 INFO  [main] com.xxl.X - hello world\n" +
+		"2026-08-16 21:30:42,100 ERROR [http-1] com.xxl.Y - boom failed\n" +
+		"   at com.xxl.Y.doSomething(X.java:10)\n" +
+		"2026-08-16 21:30:43,000 WARN  [main] com.xxl.Z - note thing\n"
 	writeFile(path, content)
 
 	fp := compileRecordPattern("%date %-5level [%thread] %logger - %m%n")
@@ -75,7 +75,7 @@ func TestLogbackPattern(t *testing.T) {
 	if r0.Thread != "main" {
 		t.Errorf("thread: %q", r0.Thread)
 	}
-	if r0.Logger != "com.pttl.X" {
+	if r0.Logger != "com.xxl.X" {
 		t.Errorf("logger: %q", r0.Logger)
 	}
 	if r0.Msg != "hello world" {
@@ -88,7 +88,7 @@ func TestLogbackPattern(t *testing.T) {
 		t.Errorf("r1: %q %q", r1.Level, r1.Thread)
 	}
 	full := string(pl.readRecord(r1))
-	if !containsStr(full, "at com.pttl.Y.doSomething") {
+	if !containsStr(full, "at com.xxl.Y.doSomething") {
 		t.Errorf("continuation not grouped: %q", full)
 	}
 }

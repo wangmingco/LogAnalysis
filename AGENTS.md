@@ -31,5 +31,5 @@ Wails v2 desktop app (Windows). Go backend in `backend/` + React 19 (JSX, no Typ
 ## Repo specifics
 
 - Files and the bundled sample log are UTF-8 with Chinese text; Windows PowerShell console output may render Chinese as mojibake — don't judge correctness from console echo.
-- Backend tests that read the bundled sample reference it as `../logs-from-pttlbdrc-report-finance-in-pttlbdrc-report-finance-56c7cdb8c8-fq8xz.log` (they run from `backend/`). Other tests use `t.TempDir()` — no external services needed.
+- Backend tests that read the bundled sample reference it as `../xxl.log` (they run from `backend/`). Other tests use `t.TempDir()` — no external services needed.
 - `backend/go.mod` has a machine-specific `replace` directive pointing to a local wails checkout (`C:\Users\wang\go\pkg\mod`) — may be invalid on other machines.

@@ -13,15 +13,16 @@ func writeLog(path, content string) {
 }
 
 // TestDetectLogbackDefault exercises the classic logback default format:
-//  2026-08-16 21:30:41,396 INFO  [main] com.pttl.X - hello world
+//
+//	2026-08-16 21:30:41,396 INFO  [main] com.xxl.X - hello world
 func TestDetectLogbackDefault(t *testing.T) {
 	dir := t.TempDir()
 	path := dir + "\\a.log"
 	writeLog(path, ""+
-		"2026-08-16 21:30:41,396 INFO  [main] com.pttl.X - hello world\n"+
-		"2026-08-16 21:30:42,100 ERROR [http-1] com.pttl.Y - boom failed\n"+
-		"   at com.pttl.Y.doSomething(X.java:10)\n"+
-		"2026-08-16 21:30:43,000 WARN  [main] com.pttl.Z - note thing\n")
+		"2026-08-16 21:30:41,396 INFO  [main] com.xxl.X - hello world\n"+
+		"2026-08-16 21:30:42,100 ERROR [http-1] com.xxl.Y - boom failed\n"+
+		"   at com.xxl.Y.doSomething(X.java:10)\n"+
+		"2026-08-16 21:30:43,000 WARN  [main] com.xxl.Z - note thing\n")
 
 	pl, err := parseLogFile(path, 2026, nil)
 	if err != nil {
@@ -44,7 +45,7 @@ func TestDetectLogbackDefault(t *testing.T) {
 	if r0.Thread != "main" {
 		t.Errorf("thread: %q", r0.Thread)
 	}
-	if r0.Logger != "com.pttl.X" {
+	if r0.Logger != "com.xxl.X" {
 		t.Errorf("logger: %q", r0.Logger)
 	}
 	if r0.Msg != "hello world" {
@@ -52,7 +53,7 @@ func TestDetectLogbackDefault(t *testing.T) {
 	}
 	// continuation grouped
 	r1 := pl.Records[1]
-	if !containsStr(string(pl.readRecord(r1)), "at com.pttl.Y.doSomething") {
+	if !containsStr(string(pl.readRecord(r1)), "at com.xxl.Y.doSomething") {
 		t.Errorf("stack trace not grouped: %q", pl.readRecord(r1))
 	}
 }
@@ -62,9 +63,9 @@ func TestDetectNoThread(t *testing.T) {
 	dir := t.TempDir()
 	path := dir + "\\b.log"
 	writeLog(path, ""+
-		"2026-08-16 21:30:41,396 INFO  com.pttl.X hello world\n"+
-		"2026-08-16 21:30:42,100 ERROR com.pttl.Y failed to connect\n"+
-		"2026-08-16 21:30:43,000 WARN  com.pttl.Z slow request\n")
+		"2026-08-16 21:30:41,396 INFO  com.xxl.X hello world\n"+
+		"2026-08-16 21:30:42,100 ERROR com.xxl.Y failed to connect\n"+
+		"2026-08-16 21:30:43,000 WARN  com.xxl.Z slow request\n")
 
 	pl, err := parseLogFile(path, 2026, nil)
 	if err != nil {
@@ -78,7 +79,7 @@ func TestDetectNoThread(t *testing.T) {
 	if r0.Thread != "" {
 		t.Errorf("thread should be empty, got %q", r0.Thread)
 	}
-	if r0.Logger != "com.pttl.X" {
+	if r0.Logger != "com.xxl.X" {
 		t.Errorf("logger: %q", r0.Logger)
 	}
 	if r0.Msg != "hello world" {
@@ -87,7 +88,8 @@ func TestDetectNoThread(t *testing.T) {
 }
 
 // TestDetectPinpoint exercises the real-world Pinpoint style layout:
-//  08-16 21:30:22.902 INFO  PinpointBootStrap : pinpoint agentArgs:null
+//
+//	08-16 21:30:22.902 INFO  PinpointBootStrap : pinpoint agentArgs:null
 func TestDetectPinpoint(t *testing.T) {
 	dir := t.TempDir()
 	path := dir + "\\c.log"
@@ -128,11 +130,11 @@ func TestDetectRejectsMsgInColumns(t *testing.T) {
 	dir := t.TempDir()
 	path := dir + "\\d.log"
 	writeLog(path, ""+
-		"2026-08-16 21:30:41,396 INFO  com.pttl.X - user signed in from 10.0.0.1\n"+
-		"2026-08-16 21:30:42,100 ERROR com.pttl.Y - failed to connect to database server\n"+
-		"2026-08-16 21:30:43,000 WARN  com.pttl.Z - connection pool nearly exhausted\n"+
-		"2026-08-16 21:30:44,500 INFO  com.pttl.X - health check ok\n"+
-		"2026-08-16 21:30:45,700 ERROR com.pttl.Y - timeout waiting for upstream api gateway\n")
+		"2026-08-16 21:30:41,396 INFO  com.xxl.X - user signed in from 10.0.0.1\n"+
+		"2026-08-16 21:30:42,100 ERROR com.xxl.Y - failed to connect to database server\n"+
+		"2026-08-16 21:30:43,000 WARN  com.xxl.Z - connection pool nearly exhausted\n"+
+		"2026-08-16 21:30:44,500 INFO  com.xxl.X - health check ok\n"+
+		"2026-08-16 21:30:45,700 ERROR com.xxl.Y - timeout waiting for upstream api gateway\n")
 
 	pl, err := parseLogFile(path, 2026, nil)
 	if err != nil {
@@ -184,9 +186,9 @@ func TestDetectISO8601(t *testing.T) {
 	dir := t.TempDir()
 	path := dir + "\\f.log"
 	writeLog(path, ""+
-		"2012-11-02T14:34:02,781 INFO  [main] com.pttl.X - iso format\n"+
-		"2012-11-02T14:34:03,100 ERROR [http-1] com.pttl.Y - boom\n"+
-		"2012-11-02T14:34:04,000 WARN  [main] com.pttl.Z - note\n")
+		"2012-11-02T14:34:02,781 INFO  [main] com.xxl.X - iso format\n"+
+		"2012-11-02T14:34:03,100 ERROR [http-1] com.xxl.Y - boom\n"+
+		"2012-11-02T14:34:04,000 WARN  [main] com.xxl.Z - note\n")
 
 	pl, err := parseLogFile(path, 2012, nil)
 	if err != nil {
@@ -197,7 +199,7 @@ func TestDetectISO8601(t *testing.T) {
 		t.Fatal("expected an auto-detected format")
 	}
 	r0 := pl.Records[0]
-	if r0.Thread != "main" || r0.Logger != "com.pttl.X" || r0.Msg != "iso format" {
+	if r0.Thread != "main" || r0.Logger != "com.xxl.X" || r0.Msg != "iso format" {
 		t.Errorf("r0: thr=%q log=%q msg=%q", r0.Thread, r0.Logger, r0.Msg)
 	}
 	if r0.Unix == 0 {
@@ -210,9 +212,9 @@ func TestDetectISOTimezone(t *testing.T) {
 	dir := t.TempDir()
 	path := dir + "\\g.log"
 	writeLog(path, ""+
-		"2012-11-02T14:34:02,781Z INFO  [main] com.pttl.X - zulu format\n"+
-		"2012-11-02T14:34:03,100Z ERROR [http-1] com.pttl.Y - boom\n"+
-		"2012-11-02T14:34:04,000Z WARN  [main] com.pttl.Z - note\n")
+		"2012-11-02T14:34:02,781Z INFO  [main] com.xxl.X - zulu format\n"+
+		"2012-11-02T14:34:03,100Z ERROR [http-1] com.xxl.Y - boom\n"+
+		"2012-11-02T14:34:04,000Z WARN  [main] com.xxl.Z - note\n")
 
 	pl, err := parseLogFile(path, 2012, nil)
 	if err != nil {
@@ -223,7 +225,7 @@ func TestDetectISOTimezone(t *testing.T) {
 		t.Fatal("expected an auto-detected format")
 	}
 	r0 := pl.Records[0]
-	if r0.Thread != "main" || r0.Logger != "com.pttl.X" || r0.Msg != "zulu format" {
+	if r0.Thread != "main" || r0.Logger != "com.xxl.X" || r0.Msg != "zulu format" {
 		t.Errorf("r0: thr=%q log=%q msg=%q", r0.Thread, r0.Logger, r0.Msg)
 	}
 	if r0.Unix == 0 {
@@ -236,9 +238,9 @@ func TestDetectAbsolute(t *testing.T) {
 	dir := t.TempDir()
 	path := dir + "\\h.log"
 	writeLog(path, ""+
-		"14:34:02,781 INFO  [main] com.pttl.X - time only\n"+
-		"14:34:03,100 ERROR [http-1] com.pttl.Y - boom\n"+
-		"14:34:04,000 WARN  [main] com.pttl.Z - note\n")
+		"14:34:02,781 INFO  [main] com.xxl.X - time only\n"+
+		"14:34:03,100 ERROR [http-1] com.xxl.Y - boom\n"+
+		"14:34:04,000 WARN  [main] com.xxl.Z - note\n")
 
 	pl, err := parseLogFile(path, 2026, nil)
 	if err != nil {
@@ -249,7 +251,7 @@ func TestDetectAbsolute(t *testing.T) {
 		t.Fatal("expected an auto-detected format")
 	}
 	r0 := pl.Records[0]
-	if r0.Thread != "main" || r0.Logger != "com.pttl.X" || r0.Msg != "time only" {
+	if r0.Thread != "main" || r0.Logger != "com.xxl.X" || r0.Msg != "time only" {
 		t.Errorf("r0: thr=%q log=%q msg=%q", r0.Thread, r0.Logger, r0.Msg)
 	}
 	if r0.Unix == 0 {
@@ -296,7 +298,7 @@ func TestValidLevel(t *testing.T) {
 			t.Errorf("validLevel(%q) = false, want true", s)
 		}
 	}
-	bad := []string{"hello-world", "com.pttl.X", "[main]", "user", "", "signed"}
+	bad := []string{"hello-world", "com.xxl.X", "[main]", "user", "", "signed"}
 	for _, s := range bad {
 		if validLevel([]byte(s)) {
 			t.Errorf("validLevel(%q) = true, want false", s)
@@ -380,7 +382,7 @@ func TestDetectMixedFormats(t *testing.T) {
 // TestRealSample runs detection on the bundled real-world log to make sure it
 // still parses into time/level/logger columns and the msg is populated.
 func TestRealSample(t *testing.T) {
-	pl, err := parseLogFile("../logs-from-pttlbdrc-report-finance-in-pttlbdrc-report-finance-56c7cdb8c8-fq8xz.log", 2026, nil)
+	pl, err := parseLogFile("../xxl.log", 2026, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
