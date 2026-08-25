@@ -1,0 +1,18 @@
+backend/detect_test.go
+  h_1e58353512d8c6 17,22-25,48,56,66-68,82,92,133-137,189-191,202,215-217,228,241-243,254,301,385
+AGENTS.md
+  h_1e58353512d8c6 34
+backend/parser_test.go
+  h_1e58353512d8c6 10,30,44,47-50,78,91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "development:1.5.3",
+  "base_commit_sha": "4c6d8333747ff09f63d6db315f7c2b7f009339e7",
+  "prompts": {},
+  "humans": {
+    "h_1e58353512d8c6": {
+      "author": "wangming <wangming.co@hotmail.com>"
+    }
+  }
+}
