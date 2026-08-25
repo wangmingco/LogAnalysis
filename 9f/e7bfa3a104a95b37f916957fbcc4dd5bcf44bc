@@ -1,0 +1,47 @@
+AGENTS.md
+  s_6ff59d3fcc77e4::t_80bb61ed0b2dea 11
+backend/main.go
+  s_6ff59d3fcc77e4::t_d672f566fb355e 20
+build.bat
+  s_6ff59d3fcc77e4::t_e0dc0752270ed2 4,7
+  s_6ff59d3fcc77e4::t_cf516a35e52301 44
+  s_6ff59d3fcc77e4::t_80cbaaec2abf47 20
+.gitignore
+  s_6ff59d3fcc77e4::t_17e0d4af378d2b 7
+backend/wails.json
+  s_6ff59d3fcc77e4::t_8cbbc3891db446 3-4
+run.bat
+  s_6ff59d3fcc77e4::t_64fda47f0aeff7 4,7,13,17,25
+frontend/index.html
+  s_6ff59d3fcc77e4::t_348ca087e7f75b 6
+frontend/src/components/CompareView.jsx
+  s_6ff59d3fcc77e4::t_2bba203b3dc05f 454,460
+  s_6ff59d3fcc77e4::t_5f3bfaedd70ee3 148-152,154-165,167-173,175,178-179
+frontend/src/components/FilterBar.jsx
+  s_6ff59d3fcc77e4::t_3d868db0d65ad7 246
+  s_6ff59d3fcc77e4::t_370d5bf98322ce 139,145-148
+README.md
+  s_6ff59d3fcc77e4::t_f795c4755b6b63 26,28
+  s_6ff59d3fcc77e4::t_38fd8db80d7c57 1
+dev.bat
+  s_6ff59d3fcc77e4::t_f996a9a3014750 18
+  s_6ff59d3fcc77e4::t_3db7a6cc98b595 4,7
+backend/go.mod
+  s_6ff59d3fcc77e4::t_0aba017862df87 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "development:1.5.3",
+  "base_commit_sha": "9fe7bfa3a104a95b37f916957fbcc4dd5bcf44bc",
+  "prompts": {},
+  "sessions": {
+    "s_6ff59d3fcc77e4": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fc8cf7f58ffeiTaxNf20QrRDHU",
+        "model": "unknown"
+      },
+      "human_author": "wangming <wangming.co@hotmail.com>"
+    }
+  }
+}
