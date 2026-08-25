@@ -1,0 +1,32 @@
+# ---- Build output ----
+build/bin/
+build/appicon.png
+build/windows/icon.ico
+backend/frontend/dist/
+frontend/dist/
+backend/loganalysiz.exe
+*.exe
+*.dll
+
+# ---- Dependencies ----
+node_modules/
+
+# ---- Generated / tooling artifacts ----
+frontend/package.json.md5
+frontend/public/favicon.ico
+frontend/public/apple-touch-icon.png
+frontend/public/favicon-16.png
+frontend/public/favicon-32.png
+frontend/public/favicon-192.png
+frontend/public/favicon-512.png
+
+# ---- IDE / OS noise ----
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sln
+*.suo
+Thumbs.db
+desktop.ini
+.DS_Store
