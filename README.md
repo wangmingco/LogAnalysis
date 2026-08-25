@@ -2,6 +2,12 @@
 
 基于 [Wails v2](https://wails.io) 的 Windows 桌面日志分析工具：Go 后端 + React 19 前端，用于快速加载、过滤、定位和对比大型日志文件。
 
+![主界面](docs/intro1.png)
+
+![过滤与高亮](docs/intro2.png)
+
+![对比视图](docs/intro3.png)
+
 ## 功能特性
 
 - **加载日志**：选择目录（递归）或单个文件，支持 `.log` / `.txt` / `.out`，多文件并行解析、去重加载。
