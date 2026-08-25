@@ -58,6 +58,7 @@ function CompareView({queue, leftKey, rightKey, entryKey, onClose, onRemove, onP
     const [msg, setMsg] = useState('');
     const [err, setErr] = useState('');
     const [diffRows, setDiffRows] = useState(null);
+    const [contentVer, setContentVer] = useState(0); // bumped on any editor change
     const [queueH, setQueueH] = useState(170);   // height of the queue list area
     const [queueMin, setQueueMin] = useState(false); // queue minimized
     const rootRef = useRef(null);
@@ -108,6 +109,7 @@ function CompareView({queue, leftKey, rightKey, entryKey, onClose, onRemove, onP
         if (ref.current) ref.current.value = v;
         if (s === 'A') setAText(v);
         else setBText(v);
+        setContentVer(n => n + 1);
     };
     const originalOf = (s) => (s === 'A' ? (left && left.text) : (right && right.text)) || '';
 
@@ -226,7 +228,7 @@ function CompareView({queue, leftKey, rightKey, entryKey, onClose, onRemove, onP
         }
         setDiffRows(diffLines(freshText('A'), freshText('B')));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [view, leftKey, rightKey]);
+    }, [view, leftKey, rightKey, contentVer]);
 
     const diffLeft = (diffRows || []).filter(r => r.type !== 'add').map(r => (r.type === 'mod' ? {...r, parts: r.aParts} : r));
     const diffRight = (diffRows || []).filter(r => r.type !== 'del').map(r => (r.type === 'mod' ? {...r, parts: r.bParts} : r));
@@ -385,7 +387,7 @@ function CompareView({queue, leftKey, rightKey, entryKey, onClose, onRemove, onP
                                 ref={aTextRef}
                                 className="cmp-text"
                                 defaultValue={aText}
-                                onChange={e => setAText(e.target.value)}
+                                onChange={e => { setAText(e.target.value); setContentVer(n => n + 1); }}
                                 onFocus={() => setActive('A')}
                                 spellCheck={false}
                                 autoCapitalize="off"
@@ -411,7 +413,7 @@ function CompareView({queue, leftKey, rightKey, entryKey, onClose, onRemove, onP
                                 ref={bTextRef}
                                 className="cmp-text"
                                 defaultValue={bText}
-                                onChange={e => setBText(e.target.value)}
+                                onChange={e => { setBText(e.target.value); setContentVer(n => n + 1); }}
                                 onFocus={() => setActive('B')}
                                 spellCheck={false}
                                 autoCapitalize="off"
