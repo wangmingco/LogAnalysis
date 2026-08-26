@@ -1,9 +1,12 @@
 import {defineConfig} from 'vite'
 import react from '@vitejs/plugin-react'
 
-// The production bundle is emitted into ../backend/frontend/dist so the
-// Go `//go:embed all:frontend/dist` in backend/main.go can embed it
-// (Go embed patterns cannot reference parent directories with '..').
+// Out directory depends on the target:
+//   - desktop build (--mode desktop, invoked by wails): emits into
+//     ../backend/frontend/dist so Go `//go:embed all:frontend/dist`
+//     (in backend/main.go) can embed it (Go embed cannot reference '..').
+//   - web / default build (npm run build, used by Cloudflare Pages):
+//     emits into ./dist inside the frontend publish root.
 export default defineConfig(({mode}) => ({
   plugins: [react()],
   server: {
@@ -14,9 +17,7 @@ export default defineConfig(({mode}) => ({
     strictPort: true
   },
   build: {
-    // Web build (--mode web) emits to frontend/dist for Cloudflare Pages;
-    // desktop build keeps emitting into ../backend/frontend/dist for Go embed.
-    outDir: mode === 'web' ? 'dist' : '../backend/frontend/dist',
+    outDir: mode === 'desktop' ? '../backend/frontend/dist' : 'dist',
     emptyOutDir: true
   }
 }))
