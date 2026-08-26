@@ -108,6 +108,10 @@ function FilePanel({
                 <button className="btn small danger" onClick={onUnload} disabled={loadedFiles.length === 0}>
                     全部卸载
                 </button>
+                <div className="panel-links">
+                    <a href="https://github.com/wangmingco/LogAnalysis" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+                    <a href="https://github.com/wangmingco/LogAnalysis/releases" target="_blank" rel="noopener noreferrer">桌面端下载</a>
+                </div>
             </div>
         </aside>
     );

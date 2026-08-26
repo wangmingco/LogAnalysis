@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {GetTimeRange} from '../../wailsjs/go/main/App';
+import {GetTimeRange} from '../Dept';
 
 const LEVELS = ['', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'];
 

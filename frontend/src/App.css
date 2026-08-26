@@ -215,6 +215,14 @@ body {
 }
 .loaded-chip span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chip-size { font-family: var(--mono); color: var(--text-mute); font-size: 11px; }
+.panel-links {
+  display: flex; gap: 8px; justify-content: space-between;
+  border-top: 1px solid var(--line-soft); padding-top: 8px;
+}
+.panel-links a {
+  color: var(--text-mute); font-size: 11px; text-decoration: none;
+}
+.panel-links a:hover { color: var(--accent); }
 
 /* ---------- Main area ---------- */
 .main {

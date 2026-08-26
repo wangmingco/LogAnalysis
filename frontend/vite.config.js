@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // The production bundle is emitted into ../backend/frontend/dist so the
 // Go `//go:embed all:frontend/dist` in backend/main.go can embed it
 // (Go embed patterns cannot reference parent directories with '..').
-export default defineConfig({
+export default defineConfig(({mode}) => ({
   plugins: [react()],
   server: {
     // Bind to IPv4 explicitly: Vite 7 binds 'localhost' to ::1 (IPv6) only,
@@ -14,7 +14,9 @@ export default defineConfig({
     strictPort: true
   },
   build: {
-    outDir: '../backend/frontend/dist',
+    // Web build (--mode web) emits to frontend/dist for Cloudflare Pages;
+    // desktop build keeps emitting into ../backend/frontend/dist for Go embed.
+    outDir: mode === 'web' ? 'dist' : '../backend/frontend/dist',
     emptyOutDir: true
   }
-})
+}))

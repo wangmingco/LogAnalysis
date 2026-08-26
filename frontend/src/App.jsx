@@ -6,8 +6,7 @@ import ResultList from './components/ResultList';
 import DetailPane from './components/DetailPane';
 import CompareView from './components/CompareView';
 import StatusBar from './components/StatusBar';
-import {Export, Filter, GetDefaultYear, GetDetectedFormats, GetLoadedFiles, GetPage, GetWorkingDir, ListLogFiles, LoadConfig, LoadFiles, LoadText, PickDirectory, PickFile, SaveConfig, UnloadAll} from '../wailsjs/go/main/App';
-import {ClipboardGetText} from '../wailsjs/runtime/runtime';
+import {Export, Filter, GetDefaultYear, GetDetectedFormats, GetLoadedFiles, GetPage, GetWorkingDir, ListLogFiles, LoadConfig, LoadFiles, LoadText, PickDirectory, PickFile, SaveConfig, UnloadAll, ClipboardGetText} from './Dept';
 
 function App() {
     const [year, setYear] = useState(2026);
