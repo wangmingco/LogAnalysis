@@ -3,19 +3,6 @@ import {GetTimeRange} from '../Dept';
 
 const LEVELS = ['', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'];
 
-// Common log date/time formats -> ready-made log4j/logback template. Selecting
-// one in the settings dialog fills the log format input with the template.
-const DATE_FORMATS = [
-    {label: 'MM-dd HH:mm:ss.SSS', value: '%date{MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger - %m%n'},
-    {label: 'yyyy-MM-dd HH:mm:ss.SSS', value: '%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger - %m%n'},
-    {label: 'yyyy-MM-dd HH:mm:ss', value: '%date{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger - %m%n'},
-    {label: 'yyyy-MM-dd HH:mm:ss,SSS', value: '%date{yyyy-MM-dd HH:mm:ss,SSS} %-5level [%thread] %logger - %m%n'},
-    {label: 'MM-dd HH:mm:ss', value: '%date{MM-dd HH:mm:ss} %-5level [%thread] %logger - %m%n'},
-    {label: 'dd/MM/yyyy HH:mm:ss', value: '%date{dd/MM/yyyy HH:mm:ss} %-5level [%thread] %logger - %m%n'},
-    {label: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", value: "%date{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger - %m%n"},
-    {label: 'HH:mm:ss（仅时间）', value: '%date{HH:mm:ss} %-5level [%thread] %logger - %m%n'},
-];
-
 // Convert "YYYY-MM-DD HH:mm:ss" to a datetime-local input value "YYYY-MM-DDTHH:mm".
 function toLocal(v) {
     if (!v) return '';
@@ -115,7 +102,7 @@ function TimeField({value, min, max, onChange, placeholder}) {
     );
 }
 
-function FilterBar({year, filter, onRun, busy, disabled, total, loadedCount, panelCollapsed, setPanelCollapsed, logFormat, setLogFormat, detectedFormats, onYearChange}) {
+function FilterBar({year, filter, onRun, busy, disabled, loadedCount, panelCollapsed, setPanelCollapsed, compareOpen, onToggleComparePanel, onExport, exportCols, hasResults}) {
     const [startTime, setStartTime] = useState(filter.startTime || '');
     const [endTime, setEndTime] = useState(filter.endTime || '');
     const [level, setLevel] = useState(filter.level || '');
@@ -124,11 +111,6 @@ function FilterBar({year, filter, onRun, busy, disabled, total, loadedCount, pan
     const [minTime, setMinTime] = useState('');
     const [maxTime, setMaxTime] = useState('');
     const inputRef = useRef(null);
-    const fmtInputRef = useRef(null);
-    const [showFmtModal, setShowFmtModal] = useState(false);
-    const [fmtInput, setFmtInput] = useState(logFormat);
-    const [dateFmt, setDateFmt] = useState('');
-    const [yearLocal, setYearLocal] = useState(year);
 
     useEffect(() => {
         setStartTime(filter.startTime || '');
@@ -177,32 +159,6 @@ function FilterBar({year, filter, onRun, busy, disabled, total, loadedCount, pan
         onRun({year, startTime: norm(startTime), endTime: norm(endTime), level, keywords});
     };
 
-    const openFmtModal = () => {
-        setFmtInput(logFormat);
-        setDateFmt('');
-        setYearLocal(year);
-        setShowFmtModal(true);
-    };
-
-    useEffect(() => {
-        if (showFmtModal) {
-            setTimeout(() => fmtInputRef.current?.focus(), 0);
-        }
-    }, [showFmtModal]);
-
-    const confirmFmt = () => {
-        setLogFormat(fmtInput.trim());
-        if (yearLocal !== year) onYearChange(yearLocal);
-        setShowFmtModal(false);
-    };
-
-    const selectDateFmt = (e) => {
-        const v = e.target.value;
-        setDateFmt(v);
-        const item = DATE_FORMATS.find(d => d.label === v);
-        if (item) setFmtInput(item.value);
-    };
-
     return (
         <div className="filter-bar">
             <button
@@ -214,14 +170,6 @@ function FilterBar({year, filter, onRun, busy, disabled, total, loadedCount, pan
             </button>
 
             <div className="filter-tools">
-                <button
-                    className="btn ghost fmt-btn"
-                    onClick={openFmtModal}
-                    title="打开设置"
-                >
-                    设置
-                </button>
-
                 <div className="lvl-wrap">
                     <div className="lvl-select">
                         <select value={level} onChange={e => setLevel(e.target.value)}>
@@ -272,93 +220,24 @@ function FilterBar({year, filter, onRun, busy, disabled, total, loadedCount, pan
                     />
                 </div>
 
-                <button className="btn primary run-btn" onClick={run} disabled={disabled || busy}>
-                    {busy ? '过滤中…' : '开始过滤'}
+                <button className="btn fb-btn fb-find" onClick={run} disabled={disabled || busy}>
+                    {busy ? '查找中…' : '查找'}
                 </button>
-                {total > 0 && <span className="total-pill">{total} 条</span>}
+                {hasResults && (
+                    <span className="fb-actions">
+                        <button
+                            className={`btn fb-btn fb-compare ${compareOpen ? 'on' : ''}`}
+                            onClick={onToggleComparePanel}
+                            title="打开对比面板，右键日志行加入对比队列"
+                        >对比</button>
+                        <button
+                            className="btn fb-btn fb-export"
+                            onClick={() => onExport(exportCols)}
+                            title="导出当前显示的列和过滤后的全部匹配结果"
+                        >导出</button>
+                    </span>
+                )}
             </div>
-
-            {showFmtModal && (
-                <div
-                    className="modal-mask"
-                    onMouseDown={e => {
-                        if (e.target === e.currentTarget) setShowFmtModal(false);
-                    }}
-                >
-                    <div className="modal modal-wide">
-                        <div className="modal-head">
-                            <span className="modal-title">设置</span>
-                            <button className="icon-btn" title="关闭" onClick={() => setShowFmtModal(false)}>✕</button>
-                        </div>
-                        <div className="modal-body">
-                            <div className="modal-field">
-                                <label className="modal-label">日志格式</label>
-                                <p className="modal-desc">
-                                    输入 logback / log4j 风格日志格式。留空则自动识别时间/级别/线程/Logger/消息等列。修改后需重新加载文件生效。
-                                </p>
-                                {detectedFormats.length > 0 && (
-                                    <div className="modal-detect">
-                                        <span className="modal-detect-label">已自动识别格式：</span>
-                                        <code className="modal-detect-fmt">{detectedFormats[0]}</code>
-                                        {detectedFormats.length > 1 && <span className="modal-detect-more">（共 {detectedFormats.length} 个）</span>}
-                                    </div>
-                                )}
-                                <input
-                                    ref={fmtInputRef}
-                                    className="modal-input"
-                                    value={fmtInput}
-                                    onChange={e => setFmtInput(e.target.value)}
-                                    onKeyDown={e => e.stopPropagation()}
-                                    onKeyUp={e => e.stopPropagation()}
-                                    placeholder="如 %date %-5level [%thread] %logger - %m%n"
-                                    autoFocus
-                                />
-                                <div className="modal-tokens">
-                                    {['%date', '%level', '%thread', '%logger', '%msg', '%n'].map(t => (
-                                        <button key={t} className="token-chip" onClick={() => setFmtInput(v => v + t)}>{t}</button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="modal-field">
-                                <label className="modal-label">日期格式</label>
-                                <p className="modal-desc">
-                                    选择日志中日期时间的常见格式，将用对应的模板填充上方"日志格式"。
-                                </p>
-                                <select
-                                    className="modal-input date-fmt-select"
-                                    value={dateFmt}
-                                    onChange={selectDateFmt}
-                                >
-                                    <option value="">自动识别（不指定）</option>
-                                    {DATE_FORMATS.map(d => (
-                                        <option key={d.label} value={d.label}>{d.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="modal-field">
-                                <label className="modal-label">日期年份</label>
-                                <p className="modal-desc">
-                                    日志时间戳不含年份时按此年份解析（默认当前年）。改年份后需重新加载文件生效。
-                                </p>
-                                <input
-                                    type="number"
-                                    className="year-input"
-                                    value={yearLocal}
-                                    min={2000}
-                                    max={2100}
-                                    onChange={e => setYearLocal(parseInt(e.target.value) || 2026)}
-                                />
-                            </div>
-                        </div>
-                        <div className="modal-foot">
-                            <button className="btn ghost" onClick={() => setShowFmtModal(false)}>取消</button>
-                            <button className="btn primary" onClick={confirmFmt}>确定</button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

@@ -25,7 +25,7 @@ function LevelBadge({level}) {
     return <span className={`lvl lvl-${lv.toLowerCase() || 'none'}`}>{lv || '—'}</span>;
 }
 
-function ResultList({entries, total, physical, folded, selected, setSelected, loadMore, busy, multi, keywords, formatActive, logFormat, onDoubleClickCell, compareOpen, compareQueue, compareLeftKey, compareRightKey, onToggleComparePanel, onToggleCompare, onExport}) {
+function ResultList({entries, total, selected, setSelected, loadMore, busy, keywords, formatActive, hiddenCols, setHiddenCols, headerCols, onDoubleClickCell, compareQueue, compareLeftKey, compareRightKey, onToggleCompare}) {
     const scrollRef = useRef(null);
     const wrapRef = useRef(null);
     const [scrollTop, setScrollTop] = useState(0);
@@ -39,29 +39,8 @@ function ResultList({entries, total, physical, folded, selected, setSelected, lo
     const menuRef = useRef(null);
 
     // column visibility (per-column right-click -> hide)
-    const [hiddenCols, setHiddenCols] = useState(new Set());
     const [colMenu, setColMenu] = useState(null); // {x, y, colId}
 
-    const FORMAT_COLS = [
-        {id: 'line', label: '行号'},
-        {id: 'file', label: '文件'},
-        {id: 'time', label: '时间'},
-        {id: 'level', label: '级别'},
-        {id: 'thread', label: '线程'},
-        {id: 'logger', label: 'Logger'},
-        {id: 'msg', label: '消息'},
-    ];
-    const PLAIN_COLS = [
-        {id: 'line', label: '行号'},
-        {id: 'file', label: '文件'},
-        {id: 'msg', label: '内容'},
-    ];
-
-    const allCols = formatActive ? FORMAT_COLS : PLAIN_COLS;
-    const headerCols = useMemo(
-        () => allCols.filter(c => c.id !== 'file' || multi),
-        [allCols, multi]
-    );
     const bodyCols = useMemo(
         () => headerCols.filter(c => !hiddenCols.has(c.id)),
         [headerCols, hiddenCols]
@@ -260,24 +239,6 @@ function ResultList({entries, total, physical, folded, selected, setSelected, lo
     return (
         <div className="result-wrap" ref={wrapRef}>
             <div className="result-head">
-                <span className="rh-title">匹配结果</span>
-                <span className="rh-total">
-                    {total} 条记录（物理行 {physical}，折叠行 {folded}） · 已加载 {entries.length}
-                </span>
-                {entries.length > 0 && (
-                    <span className="rh-compare">
-                        <button
-                            className={`btn ghost mini ${compareOpen ? 'on' : ''}`}
-                            onClick={onToggleComparePanel}
-                            title="打开对比面板，右键日志行加入对比队列"
-                        >对比</button>
-                        <button
-                            className="btn ghost mini"
-                            onClick={() => onExport(bodyCols.map(c => c.id))}
-                            title="导出当前显示的列和过滤后的全部匹配结果"
-                        >导出</button>
-                    </span>
-                )}
                 {entries.length > 0 && (
                     <span className="rh-cols">
                         {headerCols.map(renderHeaderCell)}
@@ -291,7 +252,7 @@ function ResultList({entries, total, physical, folded, selected, setSelected, lo
                             ? '正在加载…'
                             : total === 0
                                 ? '没有匹配的记录，请调整时间范围或关键字后重试'
-                                : '加载文件并设置条件后，点击"开始过滤"查看结果'}
+                                : '加载文件并设置条件后，点击"查找"查看结果'}
                     </div>
                 )}
                 {entries.length > 0 && (

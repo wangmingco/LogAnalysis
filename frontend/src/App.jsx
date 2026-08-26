@@ -8,6 +8,21 @@ import CompareView from './components/CompareView';
 import StatusBar from './components/StatusBar';
 import {Export, Filter, GetDefaultYear, GetDetectedFormats, GetLoadedFiles, GetPage, GetWorkingDir, ListLogFiles, LoadConfig, LoadFiles, LoadText, PickDirectory, PickFile, SaveConfig, UnloadAll, ClipboardGetText} from './Dept';
 
+const FORMAT_COLS = [
+    {id: 'line', label: '行号'},
+    {id: 'file', label: '文件'},
+    {id: 'time', label: '时间'},
+    {id: 'level', label: '级别'},
+    {id: 'thread', label: '线程'},
+    {id: 'logger', label: 'Logger'},
+    {id: 'msg', label: '消息'},
+];
+const PLAIN_COLS = [
+    {id: 'line', label: '行号'},
+    {id: 'file', label: '文件'},
+    {id: 'msg', label: '内容'},
+];
+
 function App() {
     const [year, setYear] = useState(2026);
     const [workingDir, setWorkingDir] = useState('');
@@ -49,9 +64,12 @@ function App() {
     const dragState = useRef(null);
 
     // detail pane collapse + height
-    const [detailCollapsed, setDetailCollapsed] = useState(false);
+    const [detailCollapsed, setDetailCollapsed] = useState(true);
     const [detailHeight, setDetailHeight] = useState(220);
     const detailDrag = useRef(null);
+
+    // result column visibility
+    const [hiddenCols, setHiddenCols] = useState(new Set());
 
     const startDetailDrag = useCallback((e) => {
         detailDrag.current = { startY: e.clientY, startH: detailHeight };
@@ -323,6 +341,11 @@ function App() {
 
     const toggleComparePanel = () => setCompareOpen(o => !o);
 
+    const formatActive = !!logFormat.trim() || detectedFormats.length > 0;
+    const multi = loadedFiles.length > 1;
+    const headerCols = (formatActive ? FORMAT_COLS : PLAIN_COLS).filter(c => c.id !== 'file' || multi);
+    const exportCols = headerCols.filter(c => !hiddenCols.has(c.id)).map(c => c.id);
+
     const toggleCompare = (e) => {
         const k = entryKey(e);
         const inQueue = compareQueue.some(x => entryKey(x) === k);
@@ -373,6 +396,11 @@ function App() {
                         onLoadClipboard={handleLoadClipboard}
                         onLoadText={text => handleLoadText('文本输入', text)}
                         onUnload={handleUnload}
+                        year={year}
+                        logFormat={logFormat}
+                        setLogFormat={setLogFormat}
+                        detectedFormats={detectedFormats}
+                        onYearChange={setYear}
                     />
                 )}
 
@@ -392,36 +420,32 @@ function App() {
                         onRun={handleRunFilter}
                         busy={filtering}
                         disabled={loadedFiles.length === 0}
-                        total={total}
                         loadedCount={loadedFiles.length}
                         panelCollapsed={panelCollapsed}
                         setPanelCollapsed={setPanelCollapsed}
-                        logFormat={logFormat}
-                        setLogFormat={setLogFormat}
-                        detectedFormats={detectedFormats}
-                        onYearChange={setYear}
+                        compareOpen={compareOpen}
+                        onToggleComparePanel={toggleComparePanel}
+                        onExport={handleExport}
+                        exportCols={exportCols}
+                        hasResults={total > 0}
                     />
                     <ResultList
                         entries={entries}
                         total={total}
-                        physical={physicalLines}
-                        folded={foldedLines}
                         selected={selected}
                         setSelected={setSelected}
                         loadMore={loadMore}
                         busy={busy || filtering}
-                        multi={loadedFiles.length > 1}
                         keywords={filter.keywords}
-                        formatActive={!!logFormat.trim() || detectedFormats.length > 0}
-                        logFormat={logFormat}
+                        formatActive={formatActive}
+                        hiddenCols={hiddenCols}
+                        setHiddenCols={setHiddenCols}
+                        headerCols={headerCols}
                         onDoubleClickCell={handleDoubleClickCell}
-                        compareOpen={compareOpen}
                         compareQueue={compareQueue}
                         compareLeftKey={compareLeftKey}
                         compareRightKey={compareRightKey}
-                        onToggleComparePanel={toggleComparePanel}
                         onToggleCompare={toggleCompare}
-                        onExport={handleExport}
                     />
 
                     {!detailCollapsed && (
@@ -450,7 +474,7 @@ function App() {
                 </main>
             </div>
 
-            <StatusBar status={statusMsg} total={total} loaded={loadedFiles.length}/>
+            <StatusBar status={statusMsg} loadedRecords={entries.length}/>
 
             {compareOpen && (
                 <CompareView
