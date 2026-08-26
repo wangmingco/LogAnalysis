@@ -1,0 +1,52 @@
+frontend/package.json
+  s_b529bfe3700c7c::t_9626d2e78b87d1 9
+frontend/src/components/FilePanel.jsx
+  s_b529bfe3700c7c::t_ebae9f5f277d58 111-114
+frontend/vite.config.js
+  s_b529bfe3700c7c::t_72fd6d73acad06 7,17-19,22
+build_web.bat
+  s_b529bfe3700c7c::t_d2a07c041198bc 1-53
+frontend/src/dept/detect.js
+  s_b529bfe3700c7c::t_f863730eff0efc 1-245
+frontend/src/App.jsx
+  s_b529bfe3700c7c::t_47a5d327d912c5 9
+docs/web-port-plan.md
+  s_b529bfe3700c7c::t_26a8d7f0783150 1-295,297-300
+  s_b529bfe3700c7c::t_e76f5b56b4e7eb 296,301-313
+frontend/src/dept/date.js
+  s_b529bfe3700c7c::t_be0ad4bb52f55c 1-3,6-185
+  s_b529bfe3700c7c::t_427f3cdf0dad29 4-5
+frontend/src/dept/pattern.js
+  s_b529bfe3700c7c::t_de4e01fe59b750 1-151
+frontend/src/Dept.js
+  s_b529bfe3700c7c::t_ca428019ff0dd9 1-33
+frontend/src/components/FilterBar.jsx
+  s_b529bfe3700c7c::t_d12203e070450c 2
+frontend/start_web.bat
+  s_b529bfe3700c7c::t_2034f1b69a5c98 1-52
+frontend/src/App.css
+  s_b529bfe3700c7c::t_04e79d55d27058 218-225
+frontend/src/dept/filter.js
+  s_b529bfe3700c7c::t_1763970c66e926 1-180
+frontend/src/dept/webApp.js
+  s_b529bfe3700c7c::t_44fef865a7ed93 1-197,200-340
+  s_b529bfe3700c7c::t_ffaa20ce769a92 198-199
+frontend/src/dept/parser.js
+  s_b529bfe3700c7c::t_72af32522932fd 1-189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "development:1.5.3",
+  "base_commit_sha": "a9e28824792666de2a13b6b924dbaed55293cc54",
+  "prompts": {},
+  "sessions": {
+    "s_b529bfe3700c7c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fc2d2bbbeffefCtzRk4kgPJDgH",
+        "model": "unknown"
+      },
+      "human_author": "wangming <wangming.co@hotmail.com>"
+    }
+  }
+}
