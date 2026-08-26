@@ -37,6 +37,8 @@ type ParsedLog struct {
 	TotalLines   int64        `json:"totalLines"`
 	Records      []*RecordRef `json:"-"`
 	fh           *os.File
+	tempPath     string // temp file backing a clipboard/text load; removed on Close
+	TextKey      string `json:"-"` // content hash for clipboard/text dedup
 	Year         int
 	Format       *recordPattern // primary compiled pattern actually used, nil if none
 	AltFormat    *recordPattern // secondary pattern for mixed-format files, may be nil
@@ -65,6 +67,10 @@ func (p *ParsedLog) Close() {
 	if p.fh != nil {
 		_ = p.fh.Close()
 		p.fh = nil
+	}
+	if p.tempPath != "" {
+		_ = os.Remove(p.tempPath)
+		p.tempPath = ""
 	}
 }
 

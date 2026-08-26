@@ -25,7 +25,7 @@ function LevelBadge({level}) {
     return <span className={`lvl lvl-${lv.toLowerCase() || 'none'}`}>{lv || '—'}</span>;
 }
 
-function ResultList({entries, total, physical, folded, selected, setSelected, loadMore, busy, multi, keywords, formatActive, logFormat, onDoubleClickCell, compareOpen, compareQueue, compareLeftKey, compareRightKey, onToggleComparePanel, onToggleCompare}) {
+function ResultList({entries, total, physical, folded, selected, setSelected, loadMore, busy, multi, keywords, formatActive, logFormat, onDoubleClickCell, compareOpen, compareQueue, compareLeftKey, compareRightKey, onToggleComparePanel, onToggleCompare, onExport}) {
     const scrollRef = useRef(null);
     const wrapRef = useRef(null);
     const [scrollTop, setScrollTop] = useState(0);
@@ -248,7 +248,10 @@ function ResultList({entries, total, physical, folded, selected, setSelected, lo
             <span
                 key={col.id}
                 className={cls}
-                title={hidden ? `右键显示"${col.label}"列` : `右键隐藏"${col.label}"列`}
+                title={hidden
+                    ? `点击显示"${col.label}"列（或右键菜单）`
+                    : `点击隐藏"${col.label}"列（或右键菜单）`}
+                onClick={() => (hidden ? showCol(col.id) : hideCol(col.id))}
                 onContextMenu={(e) => openColMenu(e, col.id)}
             >{col.label}</span>
         );
@@ -268,6 +271,11 @@ function ResultList({entries, total, physical, folded, selected, setSelected, lo
                             onClick={onToggleComparePanel}
                             title="打开对比面板，右键日志行加入对比队列"
                         >对比</button>
+                        <button
+                            className="btn ghost mini"
+                            onClick={() => onExport(bodyCols.map(c => c.id))}
+                            title="导出当前显示的列和过滤后的全部匹配结果"
+                        >导出</button>
                     </span>
                 )}
                 {entries.length > 0 && (

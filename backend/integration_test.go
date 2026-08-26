@@ -108,6 +108,74 @@ func TestLoadDedup(t *testing.T) {
 	}
 }
 
+// TestLoadText verifies clipboard/text-sourced logs are parsed, deduplicated by
+// content, and that their backing temp files are cleaned up on unload.
+func TestLoadText(t *testing.T) {
+	logText := "08-16 21:30:22.903 INFO  LoggerA : first alpha message\n" +
+		"08-16 21:30:25.100 ERROR LoggerB : second beta problem\n"
+
+	app := NewApp()
+	app.startup(context.Background())
+	defer app.UnloadAll()
+
+	first := app.LoadText("剪切板", logText, 2026, "")
+	if len(first) != 1 {
+		t.Fatalf("first LoadText: expected 1, got %d", len(first))
+	}
+	got := app.GetLoadedFiles()
+	if len(got) != 1 {
+		t.Fatalf("GetLoadedFiles after LoadText: expected 1, got %d", len(got))
+	}
+	if got[0].Name != "剪切板 1" {
+		t.Fatalf("expected name 剪切板 1, got %q", got[0].Name)
+	}
+
+	// Identical text -> skipped.
+	if second := app.LoadText("剪切板", logText, 2026, ""); len(second) != 0 {
+		t.Fatalf("identical LoadText: expected 0 new, got %d", len(second))
+	}
+
+	// Different text -> loaded under the next sequence number.
+	more := "08-16 21:31:00.000 WARN  LoggerC : third gamma warn\n"
+	if third := app.LoadText("文本输入", more, 2026, ""); len(third) != 1 {
+		t.Fatalf("second LoadText: expected 1 new, got %d", len(third))
+	}
+	if n := len(app.GetLoadedFiles()); n != 2 {
+		t.Fatalf("GetLoadedFiles after two LoadText: expected 2, got %d", n)
+	}
+
+	// Filtering sees both text-sourced logs.
+	stats := app.Filter(FilterParams{Year: 2026})
+	if stats.Total != 3 {
+		t.Fatalf("expected 3 records from text loads, got %d", stats.Total)
+	}
+
+	// Temp files created during this test must be removed after unload. Compare
+	// against the set that existed beforehand so unrelated leftovers from a real
+	// app session don't trip the check.
+	globTemp := func() []string {
+		m, _ := filepath.Glob(filepath.Join(os.TempDir(), "loganalysis-*.log"))
+		return m
+	}
+	before := globTemp()
+	app.UnloadAll()
+	after := globTemp()
+	for _, f := range after {
+		if !listHas(before, f) {
+			t.Fatalf("LoadText temp file leaked: %s", f)
+		}
+	}
+}
+
+func listHas(list []string, s string) bool {
+	for _, x := range list {
+		if x == s {
+			return true
+		}
+	}
+	return false
+}
+
 func contains(s, sub string) bool {
 	return len(s) >= len(sub) && (func() bool {
 		for i := 0; i+len(sub) <= len(s); i++ {

@@ -6,7 +6,8 @@ import ResultList from './components/ResultList';
 import DetailPane from './components/DetailPane';
 import CompareView from './components/CompareView';
 import StatusBar from './components/StatusBar';
-import {Filter, GetDefaultYear, GetDetectedFormats, GetLoadedFiles, GetPage, GetWorkingDir, ListLogFiles, LoadConfig, LoadFiles, PickDirectory, PickFile, SaveConfig, UnloadAll} from '../wailsjs/go/main/App';
+import {Export, Filter, GetDefaultYear, GetDetectedFormats, GetLoadedFiles, GetPage, GetWorkingDir, ListLogFiles, LoadConfig, LoadFiles, LoadText, PickDirectory, PickFile, SaveConfig, UnloadAll} from '../wailsjs/go/main/App';
+import {ClipboardGetText} from '../wailsjs/runtime/runtime';
 
 function App() {
     const [year, setYear] = useState(2026);
@@ -205,6 +206,41 @@ function App() {
         setStatusMsg('已清空');
     };
 
+    // Load log text pasted from the system clipboard.
+    const handleLoadClipboard = async () => {
+        let text = '';
+        try {
+            text = await ClipboardGetText();
+        } catch {
+            text = '';
+        }
+        if (!text || !text.trim()) {
+            setStatusMsg('剪贴板内容为空');
+            return;
+        }
+        await handleLoadText('剪切板', text);
+    };
+
+    // Load log text entered manually (via the text-input dialog).
+    const handleLoadText = async (label, text) => {
+        if (!text || !text.trim()) {
+            setStatusMsg('输入内容为空');
+            return;
+        }
+        setBusy(true);
+        setStatusMsg('正在解析文本日志…');
+        try {
+            await LoadText(label, text.trim(), year, logFormat);
+            const current = await GetLoadedFiles();
+            setLoadedFiles(current || []);
+            await refreshDetected();
+            setStatusMsg(`已加载 ${current.length} 个文件`);
+            if (current.length > 0) await runFilter({...filter, year});
+        } finally {
+            setBusy(false);
+        }
+    };
+
     const runFilter = async (f) => {
         setFiltering(true);
         setStatusMsg('正在过滤…');
@@ -232,6 +268,29 @@ function App() {
     const handleRunFilter = async (f) => {
         setFilter(f);
         await runFilter(f);
+    };
+
+    // Export the current filter results with exactly the columns the list shows.
+    const handleExport = async (cols) => {
+        if (loadedFiles.length === 0) {
+            setStatusMsg('没有已加载的数据');
+            return;
+        }
+        const formatActive = !!logFormat.trim() || detectedFormats.length > 0;
+        setBusy(true);
+        setStatusMsg('正在导出…');
+        try {
+            const info = await Export(formatActive, cols);
+            if (info && info.path) {
+                setStatusMsg(`已导出 ${info.name}`);
+            } else {
+                setStatusMsg('已取消导出');
+            }
+        } catch {
+            setStatusMsg('导出失败');
+        } finally {
+            setBusy(false);
+        }
     };
 
     // Double-click on a result column value adds that value as a keyword and
@@ -312,9 +371,9 @@ function App() {
                         onPickDir={handlePickDir}
                         onPickFile={handlePickFile}
                         onLoad={handleLoadSelected}
+                        onLoadClipboard={handleLoadClipboard}
+                        onLoadText={text => handleLoadText('文本输入', text)}
                         onUnload={handleUnload}
-                        year={year}
-                        onYearChange={setYear}
                     />
                 )}
 
@@ -341,6 +400,7 @@ function App() {
                         logFormat={logFormat}
                         setLogFormat={setLogFormat}
                         detectedFormats={detectedFormats}
+                        onYearChange={setYear}
                     />
                     <ResultList
                         entries={entries}
@@ -362,6 +422,7 @@ function App() {
                         compareRightKey={compareRightKey}
                         onToggleComparePanel={toggleComparePanel}
                         onToggleCompare={toggleCompare}
+                        onExport={handleExport}
                     />
 
                     {!detailCollapsed && (

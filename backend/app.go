@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/csv"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -16,10 +20,11 @@ import (
 
 // App is the application struct holding backend state.
 type App struct {
-	ctx     context.Context
-	mu      sync.Mutex
-	files   []*ParsedLog // currently parsed files
-	lastRes *CombinedResult
+	ctx      context.Context
+	mu       sync.Mutex
+	files    []*ParsedLog // currently parsed files
+	lastRes  *CombinedResult
+	textSeq  int // counter for naming clipboard/text-sourced logs
 }
 
 // NewApp creates a new App instance.
@@ -29,6 +34,12 @@ func NewApp() *App {
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+}
+
+// shutdown releases loaded data on app exit, including removing the temp files
+// that back clipboard/text-sourced logs.
+func (a *App) shutdown(ctx context.Context) {
+	a.UnloadAll()
 }
 
 // ---- file discovery ----
@@ -201,6 +212,84 @@ func (a *App) GetLoadedFiles() []FileInfo {
 		out = append(out, FileInfo{Name: filepath.Base(pl.Path), Path: pl.Path, Size: pl.Size})
 	}
 	return out
+}
+
+// LoadText parses log text pasted from the clipboard or entered manually. The
+// text is written to a temporary file and processed by the same pipeline as
+// file loads. It is registered under a synthetic path (e.g. "剪切板 1",
+// "文本输入 2") so it behaves like any other loaded source. Loading the exact
+// same text twice is skipped. Returns metadata for each newly loaded source.
+func (a *App) LoadText(label string, text string, year int, logFormat string) []FileInfo {
+	text = strings.TrimSpace(text)
+	if text == "" {
+		return nil
+	}
+	key := textKey(text)
+
+	a.mu.Lock()
+	for _, pl := range a.files {
+		if pl.TextKey == key {
+			a.mu.Unlock()
+			return nil // identical text already loaded
+		}
+	}
+	a.textSeq++
+	seq := a.textSeq
+	a.mu.Unlock()
+
+	tmp, err := writeTextTemp(text)
+	if err != nil {
+		return nil
+	}
+	format := compileRecordPattern(strings.TrimSpace(logFormat))
+	pl, err := parseLogFile(tmp, year, format)
+	if err != nil {
+		_ = os.Remove(tmp)
+		return nil
+	}
+	name := fmt.Sprintf("%s %d", label, seq)
+	pl.Path = name
+	pl.tempPath = tmp
+	pl.TextKey = key
+
+	a.mu.Lock()
+	for _, ex := range a.files {
+		if ex.TextKey == key {
+			a.mu.Unlock()
+			_ = os.Remove(tmp)
+			return nil // lost the race with a concurrent identical load
+		}
+	}
+	a.files = append(a.files, pl)
+	a.lastRes = nil
+	a.mu.Unlock()
+	return []FileInfo{{Name: name, Path: name, Size: pl.Size}}
+}
+
+// writeTextTemp writes text to a fresh temp file (kept in the OS temp dir) and
+// returns its path. The caller is responsible for removing the file.
+func writeTextTemp(text string) (string, error) {
+	f, err := os.CreateTemp("", "loganalysis-*.log")
+	if err != nil {
+		return "", err
+	}
+	tmp := f.Name()
+	if _, err := f.WriteString(text); err != nil {
+		_ = f.Close()
+		_ = os.Remove(tmp)
+		return "", err
+	}
+	if err := f.Close(); err != nil {
+		_ = os.Remove(tmp)
+		return "", err
+	}
+	return tmp, nil
+}
+
+// textKey returns a content hash used to deduplicate clipboard/text loads.
+func textKey(s string) string {
+	sum := sha256.Sum256([]byte(s))
+	return hex.EncodeToString(sum[:])
 }
 
 // GetDetectedFormats returns the log4j/logback patterns that were auto-detected
@@ -381,6 +470,94 @@ func (a *App) GetPage(offset, limit int) []LogEntry {
 		out = append(out, entry)
 	}
 	return out
+}
+
+// Export writes the current filter results to a CSV file chosen via a save
+// dialog (default filename "YYYYMMDDHHMMSS.log"). The exported columns are
+// exactly the ones the result list currently shows: only the given visible
+// column ids (line/file/time/level/thread/logger/msg) are written, and only
+// the records matching the current filter. format indicates the list is in
+// structured mode (msg = parsed message) vs plain mode (msg = raw record
+// text). Returns the written file's info, or an empty FileInfo when the user
+// cancels the dialog.
+func (a *App) Export(format bool, cols []string) FileInfo {
+	a.mu.Lock()
+	files := make([]*ParsedLog, len(a.files))
+	copy(files, a.files)
+	res := a.lastRes
+	a.mu.Unlock()
+
+	if res == nil || len(files) == 0 {
+		return FileInfo{}
+	}
+
+	path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           "导出匹配结果",
+		DefaultFilename: time.Now().Format("20060102150405") + ".log",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "日志文件 (*.log)", Pattern: "*.log"},
+			{DisplayName: "所有文件 (*.*)", Pattern: "*.*"},
+		},
+	})
+	if err != nil || path == "" {
+		return FileInfo{} // cancelled
+	}
+
+	f, err := os.Create(path)
+	if err != nil {
+		return FileInfo{}
+	}
+	defer f.Close()
+	_, _ = f.WriteString("\xEF\xBB\xBF") // UTF-8 BOM so Excel reads Chinese correctly
+	w := csv.NewWriter(f)
+
+	labels := map[string]string{
+		"line": "行号", "file": "文件", "time": "时间", "level": "级别",
+		"thread": "线程", "logger": "Logger", "msg": "消息",
+	}
+	if !format {
+		labels["msg"] = "内容"
+	}
+	header := make([]string, len(cols))
+	for i, c := range cols {
+		header[i] = labels[c]
+	}
+	_ = w.Write(header)
+
+	for _, it := range res.Items {
+		if it.File >= len(files) || it.Rec >= len(files[it.File].Records) {
+			continue
+		}
+		pl := files[it.File]
+		rec := pl.Records[it.Rec]
+		row := make([]string, len(cols))
+		for i, c := range cols {
+			switch c {
+			case "line":
+				row[i] = strconv.FormatInt(rec.LineNo, 10)
+			case "file":
+				row[i] = filepath.Base(pl.Path)
+			case "time":
+				row[i] = rec.Time
+			case "level":
+				row[i] = rec.Level
+			case "thread":
+				row[i] = rec.Thread
+			case "logger":
+				row[i] = rec.Logger
+			case "msg":
+				if format {
+					row[i] = rec.Msg
+				} else {
+					row[i] = string(pl.readRecord(rec))
+				}
+			}
+		}
+		_ = w.Write(row)
+	}
+	w.Flush()
+	st, _ := f.Stat()
+	return FileInfo{Name: filepath.Base(path), Path: path, Size: st.Size()}
 }
 
 // Greet kept for template compatibility.

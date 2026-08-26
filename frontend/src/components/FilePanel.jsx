@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState} from 'react';
+import TextInputModal from './TextInputModal';
 
 function fmtSize(bytes) {
     if (!bytes) return '0 B';
@@ -10,8 +11,10 @@ function fmtSize(bytes) {
 
 function FilePanel({
     width, workingDir, files, selectedPaths, setSelectedPaths, loadedFiles,
-    onRefresh, onPickDir, onPickFile, onLoad, onUnload, year, onYearChange,
+    onRefresh, onPickDir, onPickFile, onLoad, onUnload,
+    onLoadClipboard, onLoadText,
 }) {
+    const [textOpen, setTextOpen] = useState(false);
     const toggle = (path) => {
         setSelectedPaths(prev => {
             const next = new Set(prev);
@@ -35,6 +38,18 @@ function FilePanel({
                 <button className="btn ghost" onClick={onPickFile}>打开文件</button>
             </div>
 
+            <div className="panel-actions">
+                <button className="btn ghost" title="读取剪贴板中的日志文本" onClick={onLoadClipboard}>粘贴日志</button>
+                <button className="btn ghost" title="手动输入或粘贴日志文本" onClick={() => setTextOpen(true)}>手动输入</button>
+            </div>
+
+            {textOpen && (
+                <TextInputModal
+                    onClose={() => setTextOpen(false)}
+                    onSubmit={onLoadText}
+                />
+            )}
+
             <div className="panel-head">
                 <span className="panel-title">文件列表</span>
                 <button className="icon-btn" title="刷新目录" onClick={() => onRefresh(workingDir, false)}>⟳</button>
@@ -43,18 +58,6 @@ function FilePanel({
             <div className="dir-row" title={workingDir || '未选择目录'}>
                 <span className="dir-icon">▸</span>
                 <span className="dir-path">{workingDir || '点击上方"打开目录"选择工作目录'}</span>
-            </div>
-
-            <div className="year-row">
-                <label>日志年份</label>
-                <input
-                    type="number"
-                    className="year-input"
-                    value={year}
-                    min={2000}
-                    max={2100}
-                    onChange={e => onYearChange(parseInt(e.target.value) || 2026)}
-                />
             </div>
 
             <div className="file-toolbar">
