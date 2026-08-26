@@ -1,0 +1,64 @@
+frontend/wailsjs/go/main/App.d.ts
+  s_57e0a5a93c472c::t_b9ccc0a335851d 29-30
+frontend/src/components/TextInputModal.jsx
+  s_57e0a5a93c472c::t_bbf069148ca777 1-58
+frontend/src/App.jsx
+  s_57e0a5a93c472c::t_47fc96c19f6aa4 273-295
+  s_57e0a5a93c472c::t_9742c1f99da79f 374-375
+  s_57e0a5a93c472c::t_5b68972f1944cc 10
+  s_57e0a5a93c472c::t_20ea9ab07f5c24 403
+  s_57e0a5a93c472c::t_1b71821f38a613 425
+  s_57e0a5a93c472c::t_4abbe9ccd92312 9
+  s_57e0a5a93c472c::t_2b0ab6fc41c40e 209-243
+frontend/src/components/ResultList.jsx
+  s_57e0a5a93c472c::t_6fb7389eb12fdc 251-254
+  s_57e0a5a93c472c::t_3c2fec633db240 28
+  s_57e0a5a93c472c::t_e365d9ec624e26 274-278
+backend/parser.go
+  s_57e0a5a93c472c::t_0c05b3e1b20280 71-74
+  s_57e0a5a93c472c::t_7cdd702a4aaf2a 40-41
+backend/integration_test.go
+  s_57e0a5a93c472c::t_dfb9d90391d3c1 164,170
+  s_57e0a5a93c472c::t_e369003d9e7bad 153-160,162-163,165-166,168-169,171-174,176
+  s_57e0a5a93c472c::t_7130b0180d386b 111-152,161,167,175,177-178
+frontend/src/components/FilterBar.jsx
+  s_57e0a5a93c472c::t_efb2e297d70071 6-18
+  s_57e0a5a93c472c::t_2e103ebd9736d6 220,222
+  s_57e0a5a93c472c::t_1f9e8b4a842059 288,290,294-319,321-352
+  s_57e0a5a93c472c::t_23cd44d3676fdc 118,130-131
+  s_57e0a5a93c472c::t_0b4bed39f667e8 182-183,195,199-203
+backend/main.go
+  s_57e0a5a93c472c::t_9b72dabf019b7a 30
+frontend/src/App.css
+  s_57e0a5a93c472c::t_ae496ac1566620 496-499
+  s_57e0a5a93c472c::t_ee886042445281 479-495
+frontend/wailsjs/go/main/App.js
+  s_57e0a5a93c472c::t_e080a2c018833b 53-56
+backend/app.go
+  s_57e0a5a93c472c::t_216e3164bf9580 39-44
+  s_57e0a5a93c472c::t_663a46384f4a02 6,13
+  s_57e0a5a93c472c::t_1fac762d1f8004 475-562
+  s_57e0a5a93c472c::t_dd6796f2cd3a50 5,7
+  s_57e0a5a93c472c::t_8f439fddef115d 23-27
+  s_57e0a5a93c472c::t_3cc2601a5c8b39 217-294
+frontend/src/components/FilePanel.jsx
+  s_57e0a5a93c472c::t_361d7838b079fe 1-2,15,17
+  s_57e0a5a93c472c::t_8c7633f7f8bdd2 14
+  s_57e0a5a93c472c::t_9cbf4640ff4b54 41-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "development:1.5.3",
+  "base_commit_sha": "14ec834007093c35a75d44539ed219c7f594b0a4",
+  "prompts": {},
+  "sessions": {
+    "s_57e0a5a93c472c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fc3598d37ffepHWkMMN1Mh5VR5",
+        "model": "unknown"
+      },
+      "human_author": "wangming <wangming.co@hotmail.com>"
+    }
+  }
+}
