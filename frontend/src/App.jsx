@@ -339,6 +339,16 @@ function App() {
 
     const entryKey = (e) => e.lineNo + '|' + e.fileName;
 
+    const deleteRow = (e) => {
+        const k = entryKey(e);
+        setEntries(prev => prev.filter(x => entryKey(x) !== k));
+        setSelected(sel => (sel && entryKey(sel) === k ? null : sel));
+        setCompareQueue(prev => prev.filter(x => entryKey(x) !== k));
+        setCompareLeftKey(lk => (lk === k ? null : lk));
+        setCompareRightKey(rk => (rk === k ? null : rk));
+        setStatusMsg(`已删除记录 ${e.lineNo}`);
+    };
+
     const toggleComparePanel = () => setCompareOpen(o => !o);
 
     const formatActive = !!logFormat.trim() || detectedFormats.length > 0;
@@ -446,6 +456,7 @@ function App() {
                         compareLeftKey={compareLeftKey}
                         compareRightKey={compareRightKey}
                         onToggleCompare={toggleCompare}
+                        onDeleteRow={deleteRow}
                     />
 
                     {!detailCollapsed && (

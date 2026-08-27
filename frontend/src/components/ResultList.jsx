@@ -25,7 +25,7 @@ function LevelBadge({level}) {
     return <span className={`lvl lvl-${lv.toLowerCase() || 'none'}`}>{lv || '—'}</span>;
 }
 
-function ResultList({entries, total, selected, setSelected, loadMore, busy, keywords, formatActive, hiddenCols, setHiddenCols, headerCols, onDoubleClickCell, compareQueue, compareLeftKey, compareRightKey, onToggleCompare}) {
+function ResultList({entries, total, selected, setSelected, loadMore, busy, keywords, formatActive, hiddenCols, setHiddenCols, headerCols, onDoubleClickCell, compareQueue, compareLeftKey, compareRightKey, onToggleCompare, onDeleteRow}) {
     const scrollRef = useRef(null);
     const wrapRef = useRef(null);
     const [scrollTop, setScrollTop] = useState(0);
@@ -303,6 +303,15 @@ function ResultList({entries, total, selected, setSelected, loadMore, busy, keyw
                                 ? '移除对比'
                                 : '加入对比'}
                         </button>
+                    </div>
+                    <div className="ctx-sep" />
+                    <div className="ctx-head">操作</div>
+                    <div className="ctx-btns">
+                        <button className="ctx-danger" onClick={() => {
+                            const e = entries[menu.refIdx];
+                            if (e && onDeleteRow) onDeleteRow(e);
+                            setMenu(null);
+                        }}>删除该行</button>
                     </div>
                     <div className="ctx-sep" />
                     <div className="ctx-head">范围选择</div>

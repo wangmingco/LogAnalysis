@@ -698,6 +698,7 @@ body {
   transition: all .12s;
 }
 .ctx-btns button:hover { background: var(--accent-dim); border-color: rgba(255, 176, 32, 0.4); color: var(--accent); }
+.ctx-btns button.ctx-danger:hover { background: rgba(244, 63, 94, 0.12); border-color: rgba(244, 63, 94, 0.4); color: var(--danger); }
 
 .row-line { font-family: var(--mono); color: var(--text-mute); font-size: 11px; min-width: 46px; text-align: right; user-select: none; flex-shrink: 0; }
 .row-file {
